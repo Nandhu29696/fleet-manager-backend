@@ -1,5 +1,7 @@
 const fs = require('fs');
 const { Sequelize } = require('sequelize');
+// Required explicitly so Vercel's bundler includes it; Sequelize's own dynamic require is invisible to it.
+const mysql2 = require('mysql2');
 const env = require('./env');
 const { logger } = require('./logger');
 
@@ -15,6 +17,7 @@ const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PASS, {
   host: env.DB_HOST,
   port: env.DB_PORT,
   dialect: 'mysql',
+  dialectModule: mysql2,
   timezone: '+05:30',
   logging: env.isDev ? (sql) => logger.debug(sql, { source: 'sequelize' }) : false,
   // Each Vercel instance has its own pool, so keep it small to stay under the host's connection limit.
