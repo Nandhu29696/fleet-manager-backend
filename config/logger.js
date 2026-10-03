@@ -70,20 +70,25 @@ function rotatingFile(filename, level) {
   });
 }
 
+// On Vercel there is no writable disk, so logs go to stdout as JSON and show in the Vercel logs.
+const serverlessConsole = () => new winston.transports.Console({ format: fileFormat });
+
 const logger = winston.createLogger({
   level: env.LOG_LEVEL,
-  transports: [rotatingFile('app', env.LOG_LEVEL), rotatingFile('error', 'error')],
+  transports: env.isServerless
+    ? [serverlessConsole()]
+    : [rotatingFile('app', env.LOG_LEVEL), rotatingFile('error', 'error')],
   exitOnError: false,
 });
 
-if (!env.isProd) {
+if (!env.isProd && !env.isServerless) {
   logger.add(new winston.transports.Console({ format: consoleFormat }));
 }
 
 // Frontend logs are written to their own file (see routes/clientLogs.routes.js).
 const clientLogger = winston.createLogger({
   level: 'debug',
-  transports: [rotatingFile('client', 'debug')],
+  transports: [env.isServerless ? serverlessConsole() : rotatingFile('client', 'debug')],
   exitOnError: false,
 });
 

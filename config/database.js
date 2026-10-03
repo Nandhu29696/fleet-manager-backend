@@ -17,7 +17,8 @@ const sequelize = new Sequelize(env.DB_NAME, env.DB_USER, env.DB_PASS, {
   dialect: 'mysql',
   timezone: '+05:30',
   logging: env.isDev ? (sql) => logger.debug(sql, { source: 'sequelize' }) : false,
-  pool: { max: 10, min: 0, acquire: 30000, idle: 10000 },
+  // Each Vercel instance has its own pool, so keep it small to stay under the host's connection limit.
+  pool: { max: env.isServerless ? 2 : 10, min: 0, acquire: 30000, idle: 10000 },
   dialectOptions: {
     // Keep DATE/DATETIME as plain strings (no timezone shifting) and DECIMAL as numbers.
     dateStrings: true,

@@ -10,3 +10,6 @@ uploads/*
 !uploads/.gitkeep
 .DS_Store
 .vscode/
+
+# Database dumps contain real data
+backups/

@@ -42,10 +42,14 @@ if (!parsed.success) {
 const env = parsed.data;
 const serverRoot = path.join(__dirname, '..');
 
+// Vercel sets VERCEL=1. Its file system is read-only except /tmp, which is wiped between invocations.
+const isServerless = Boolean(process.env.VERCEL);
+
 module.exports = {
   ...env,
   isProd: env.NODE_ENV === 'production',
   isDev: env.NODE_ENV === 'development',
+  isServerless,
   logDir: path.resolve(serverRoot, env.LOG_DIR),
-  uploadDir: path.resolve(serverRoot, env.UPLOAD_DIR),
+  uploadDir: isServerless ? '/tmp/uploads' : path.resolve(serverRoot, env.UPLOAD_DIR),
 };

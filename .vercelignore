@@ -1,0 +1,6 @@
+.env
+.env.*
+backups
+logs
+uploads
+tests
